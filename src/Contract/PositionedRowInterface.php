@@ -9,11 +9,9 @@
 
 namespace Ang3\Component\ETL\Contract;
 
-interface ContextFactoryInterface
+interface PositionedRowInterface extends RowInterface
 {
-    public function create(
-        DatasetInterface $dataset,
-        RowInterface $input,
-        MutableRowInterface $output,
-    ): ContextInterface;
+    public function rowIndex(): int;
+
+    public function sourceLineNumber(): ?int;
 }

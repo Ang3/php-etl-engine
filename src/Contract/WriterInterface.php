@@ -9,6 +9,8 @@
 
 namespace Ang3\Component\ETL\Contract;
 
+use Ang3\Component\ETL\Result\ProcessedRow;
+
 /**
  * Writes a processed row.
  *
@@ -17,5 +19,5 @@ namespace Ang3\Component\ETL\Contract;
  */
 interface WriterInterface
 {
-    public function write(RowInterface $row, ContextInterface $context): void;
+    public function write(ProcessedRow $row, ContextInterface $context): void;
 }

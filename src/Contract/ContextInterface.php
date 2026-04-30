@@ -11,11 +11,15 @@ namespace Ang3\Component\ETL\Contract;
 
 interface ContextInterface
 {
+    public function dataset(): DatasetInterface;
+
     public function input(): RowInterface;
 
     public function output(): MutableRowInterface;
 
-    public function dataset(): DatasetInterface;
+    public function rowIndex(): ?int;
+
+    public function sourceLineNumber(): ?int;
 
     public function getInput(string $key, mixed $default = null): mixed;
 

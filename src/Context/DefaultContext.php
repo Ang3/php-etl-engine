@@ -12,6 +12,7 @@ namespace Ang3\Component\ETL\Context;
 use Ang3\Component\ETL\Contract\CacheAwareContextInterface;
 use Ang3\Component\ETL\Contract\DatasetInterface;
 use Ang3\Component\ETL\Contract\MutableRowInterface;
+use Ang3\Component\ETL\Contract\PositionedRowInterface;
 use Ang3\Component\ETL\Contract\RowInterface;
 
 class DefaultContext implements CacheAwareContextInterface
@@ -27,10 +28,15 @@ class DefaultContext implements CacheAwareContextInterface
     private array $cache = [];
 
     public function __construct(
+        private readonly DatasetInterface $dataset,
         private readonly RowInterface $input,
         private readonly MutableRowInterface $output,
-        private readonly DatasetInterface $dataset,
     ) {
+    }
+
+    public function dataset(): DatasetInterface
+    {
+        return $this->dataset;
     }
 
     public function input(): RowInterface
@@ -43,9 +49,18 @@ class DefaultContext implements CacheAwareContextInterface
         return $this->output;
     }
 
-    public function dataset(): DatasetInterface
+    public function rowIndex(): ?int
     {
-        return $this->dataset;
+        return $this->input instanceof PositionedRowInterface
+            ? $this->input->rowIndex()
+            : null;
+    }
+
+    public function sourceLineNumber(): ?int
+    {
+        return $this->input instanceof PositionedRowInterface
+            ? $this->input->sourceLineNumber()
+            : null;
     }
 
     public function getInput(string $key, mixed $default = null): mixed

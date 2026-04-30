@@ -19,10 +19,10 @@ use Ang3\Component\ETL\Contract\RowInterface;
 final class DefaultContextFactory implements ContextFactoryInterface
 {
     public function create(
+        DatasetInterface $dataset,
         RowInterface $input,
         MutableRowInterface $output,
-        DatasetInterface $dataset,
     ): ContextInterface {
-        return new DefaultContext($input, $output, $dataset);
+        return new DefaultContext($dataset, $input, $output);
     }
 }
