@@ -13,6 +13,7 @@ help:
 	@echo "  up         Launch the container"
 	@echo "  down       Stop and delete the container"
 	@echo "  logs       Display logs"
+	@echo "  php        Launch bash inside PHP container"
 
 build:
 	$(DC) build
@@ -25,3 +26,6 @@ down:
 
 logs:
 	$(DC) logs -f $(SERVICE)
+
+bash: ## Connect to the PHP container (bash)
+	@$(DC) exec php bash

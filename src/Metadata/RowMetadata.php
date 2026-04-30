@@ -1,5 +1,12 @@
 <?php
 
+/*
+ * This file is part of package ang3/php-etl-engine
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
 namespace Ang3\Component\ETL\Metadata;
 
 use Ang3\Component\ETL\Contract\MutableRowInterface;
@@ -11,6 +18,9 @@ use Webmozart\Assert\Assert;
  */
 class RowMetadata implements MutableRowInterface, \ArrayAccess
 {
+    /**
+     * @param array<string, mixed> $data
+     */
     public function __construct(private array $data = [])
     {
     }
@@ -33,6 +43,8 @@ class RowMetadata implements MutableRowInterface, \ArrayAccess
 
     /**
      * @see RowInterface
+     *
+     * @return array<string, mixed>
      */
     public function all(): array
     {

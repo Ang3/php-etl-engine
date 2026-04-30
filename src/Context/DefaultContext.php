@@ -1,22 +1,35 @@
 <?php
 
+/*
+ * This file is part of package ang3/php-etl-engine
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
 namespace Ang3\Component\ETL\Context;
 
 use Ang3\Component\ETL\Contract\CacheAwareContextInterface;
-use Ang3\Component\ETL\Contract\ContextInterface;
 use Ang3\Component\ETL\Contract\DatasetInterface;
 use Ang3\Component\ETL\Contract\MutableRowInterface;
 use Ang3\Component\ETL\Contract\RowInterface;
 
 class DefaultContext implements CacheAwareContextInterface
 {
+    /**
+     * @var array<string, mixed>
+     */
     private array $options = [];
+
+    /**
+     * @var array<string, mixed>
+     */
     private array $cache = [];
 
     public function __construct(
         private readonly RowInterface $input,
         private readonly MutableRowInterface $output,
-        private readonly ?DatasetInterface $dataset = null
+        private readonly DatasetInterface $dataset,
     ) {
     }
 
@@ -30,7 +43,7 @@ class DefaultContext implements CacheAwareContextInterface
         return $this->output;
     }
 
-    public function dataset(): ?DatasetInterface
+    public function dataset(): DatasetInterface
     {
         return $this->dataset;
     }

@@ -9,9 +9,9 @@
 
 namespace Ang3\Component\ETL\Contract;
 
-use Ang3\Component\ETL\Metadata\FieldMetadata;
+use Ang3\Component\ETL\Metadata\FieldSourceMetadata;
 
-interface FieldValueResolverInterface
+interface HeaderResolverInterface
 {
-    public function resolve(FieldMetadata $field, ContextInterface $context): mixed;
+    public function resolve(FieldSourceMetadata $source, ContextInterface $context): ?string;
 }
