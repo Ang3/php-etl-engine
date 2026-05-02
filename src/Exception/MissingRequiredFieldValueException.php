@@ -1,11 +1,18 @@
 <?php
 
+/*
+ * This file is part of package ang3/php-etl-engine
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
 namespace Ang3\Component\ETL\Exception;
 
 use Ang3\Component\ETL\Contract\Enum\EtlErrorCode;
 use Ang3\Component\ETL\Metadata\FieldMetadata;
 
-final class RequiredFieldValueMissingException extends ValidationEtlException
+final class MissingRequiredFieldValueException extends ValidationEtlException
 {
     public function __construct(
         private readonly FieldMetadata $field,
@@ -17,9 +24,9 @@ final class RequiredFieldValueMissingException extends ValidationEtlException
     ) {
         parent::__construct(
             message: $message ?? sprintf(
-            'Missing required value for field "%s".',
-            $field->reference,
-        ),
+                'Missing required value for field "%s".',
+                $field->reference,
+            ),
             errorCode: EtlErrorCode::MissingRequiredField,
             errorParameters: [
                 'field' => $field->reference,
