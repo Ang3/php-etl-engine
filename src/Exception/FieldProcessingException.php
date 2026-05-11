@@ -13,7 +13,7 @@ use Ang3\Component\ETL\Contract\Enum\ErrorStage;
 use Ang3\Component\ETL\Contract\Enum\EtlErrorCode;
 use Ang3\Component\ETL\Metadata\FieldMetadata;
 
-final class FieldProcessingException extends TechnicalEtlException
+final class FieldProcessingException extends TechnicalEtlException implements StagedExceptionInterface
 {
     public function __construct(
         private readonly FieldMetadata $field,

@@ -43,19 +43,14 @@ final readonly class DefaultFieldProcessor implements FieldProcessorInterface
         } catch (EtlException $e) {
             throw $e;
         } catch (\Throwable $e) {
-            throw new FieldProcessingException(
-                field: $field,
-                stage: ErrorStage::FieldResolution,
-                rawValue: null,
-                previous: $e
-            );
+            throw new FieldProcessingException(field: $field, stage: ErrorStage::FieldResolution, rawValue: null, previous: $e);
         }
     }
 
     /**
      * @internal
      */
-    private function transformValue(FieldMetadata $field, ContextInterface $context, mixed $rawValue,): mixed
+    private function transformValue(FieldMetadata $field, ContextInterface $context, mixed $rawValue): mixed
     {
         try {
             $transformer = $this->transformers->get($field);
@@ -64,12 +59,7 @@ final readonly class DefaultFieldProcessor implements FieldProcessorInterface
         } catch (EtlException $e) {
             throw $e;
         } catch (\Throwable $e) {
-            throw new FieldProcessingException(
-                field: $field,
-                stage: ErrorStage::FieldTransformation,
-                rawValue: $rawValue,
-                previous: $e
-            );
+            throw new FieldProcessingException(field: $field, stage: ErrorStage::FieldTransformation, rawValue: $rawValue, previous: $e);
         }
     }
 }
