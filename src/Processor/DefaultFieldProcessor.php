@@ -10,6 +10,7 @@
 namespace Ang3\Component\ETL\Processor;
 
 use Ang3\Component\ETL\Contract\ContextInterface;
+use Ang3\Component\ETL\Contract\Enum\ErrorStage;
 use Ang3\Component\ETL\Contract\FieldProcessorInterface;
 use Ang3\Component\ETL\Contract\FieldValueResolverInterface;
 use Ang3\Component\ETL\Exception\EtlException;
@@ -27,23 +28,42 @@ final readonly class DefaultFieldProcessor implements FieldProcessorInterface
 
     public function process(FieldMetadata $field, ContextInterface $context): void
     {
-        $rawValue = null;
+        $rawValue = $this->resolveValue($field, $context);
+        $value = $this->transformValue($field, $context, $rawValue);
 
+        $context->set($field->reference, $value);
+    }
+
+    /**
+     * @internal
+     */
+    private function resolveValue(FieldMetadata $field, ContextInterface $context): mixed
+    {
         try {
-            $rawValue = $this->valueResolver->resolve($field, $context);
-
-            $transformer = $this->transformers->get($field);
-            $value = $transformer->transform($rawValue, $field, $context);
-
-            $context->set($field->reference, $value);
+            return $this->valueResolver->resolve($field, $context);
         } catch (EtlException $e) {
             throw $e;
         } catch (\Throwable $e) {
-            throw new FieldProcessingException(
-                field: $field,
-                rawValue: $rawValue,
-                previous: $e,
-            );
+            throw new FieldProcessingException(field: $field, stage: ErrorStage::FieldResolution, rawValue: null, previous: $e);
+        }
+    }
+
+    /**
+     * @internal
+     */
+    private function transformValue(
+        FieldMetadata $field,
+        ContextInterface $context,
+        mixed $rawValue,
+    ): mixed {
+        try {
+            $transformer = $this->transformers->get($field);
+
+            return $transformer->transform($rawValue, $field, $context);
+        } catch (EtlException $e) {
+            throw $e;
+        } catch (\Throwable $e) {
+            throw new FieldProcessingException(field: $field, stage: ErrorStage::FieldTransformation, rawValue: $rawValue, previous: $e);
         }
     }
 }

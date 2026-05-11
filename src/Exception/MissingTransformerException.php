@@ -1,5 +1,12 @@
 <?php
 
+/*
+ * This file is part of package ang3/php-etl-engine
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
 namespace Ang3\Component\ETL\Exception;
 
 use Ang3\Component\ETL\Contract\Enum\EtlErrorCode;
@@ -14,10 +21,10 @@ final class MissingTransformerException extends TechnicalEtlException
     ) {
         parent::__construct(
             message: $message ?? sprintf(
-            'No transformer found for field "%s" of type "%s".',
-            $field->reference,
-            $field->type,
-        ),
+                'No transformer found for field "%s" of type "%s".',
+                $field->reference,
+                $field->type,
+            ),
             errorCode: EtlErrorCode::MissingTransformer,
             errorParameters: [
                 'field' => $field->reference,

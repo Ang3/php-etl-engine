@@ -37,10 +37,7 @@ final readonly class DefaultFieldValueResolver implements FieldValueResolverInte
         }
 
         if ($source->required) {
-            throw new MissingRequiredFieldValueException(
-                field: $field,
-                sourceKey: $source->key,
-            );
+            throw new MissingRequiredFieldValueException(field: $field, sourceKey: $source->key);
         }
 
         return $source->default;
