@@ -21,8 +21,8 @@ use Ang3\Component\ETL\Result\ProcessedRow;
 readonly class DefaultPipeline implements PipelineInterface
 {
     public function __construct(
-        private FieldProcessorInterface $fieldProcessor,
         private ContextFactoryInterface $contextFactory,
+        private FieldProcessorInterface $fieldProcessor,
         private OutputRowFactoryInterface $outputRowFactory,
         private WriterInterface $writer,
     ) {
