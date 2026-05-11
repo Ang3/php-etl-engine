@@ -12,6 +12,7 @@ namespace Ang3\Component\ETL\Resolver;
 use Ang3\Component\ETL\Contract\ContextInterface;
 use Ang3\Component\ETL\Contract\FieldValueResolverInterface;
 use Ang3\Component\ETL\Contract\HeaderResolverInterface;
+use Ang3\Component\ETL\Exception\MissingRequiredFieldValueException;
 use Ang3\Component\ETL\Metadata\FieldMetadata;
 
 final readonly class DefaultFieldValueResolver implements FieldValueResolverInterface
@@ -36,7 +37,10 @@ final readonly class DefaultFieldValueResolver implements FieldValueResolverInte
         }
 
         if ($source->required) {
-            throw new \InvalidArgumentException(sprintf('Missing required field "%s".', $field->reference));
+            throw new MissingRequiredFieldValueException(
+                field: $field,
+                sourceKey: $source->key,
+            );
         }
 
         return $source->default;

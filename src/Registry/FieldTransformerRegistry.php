@@ -10,6 +10,7 @@
 namespace Ang3\Component\ETL\Registry;
 
 use Ang3\Component\ETL\Contract\FieldTransformerInterface;
+use Ang3\Component\ETL\Exception\MissingTransformerException;
 use Ang3\Component\ETL\Metadata\FieldMetadata;
 
 class FieldTransformerRegistry
@@ -32,7 +33,7 @@ class FieldTransformerRegistry
             }
         }
 
-        throw new \InvalidArgumentException(sprintf('Missing field "%s".', $field->reference));
+        throw new MissingTransformerException($field);
     }
 
     /**
