@@ -16,6 +16,7 @@ use Ang3\Component\ETL\Contract\FieldProcessorInterface;
 use Ang3\Component\ETL\Contract\OutputRowFactoryInterface;
 use Ang3\Component\ETL\Contract\PipelineInterface;
 use Ang3\Component\ETL\Contract\WriterInterface;
+use Ang3\Component\ETL\Result\EtlReport;
 use Ang3\Component\ETL\Result\ProcessedRow;
 
 readonly class DefaultPipeline implements PipelineInterface
@@ -28,11 +29,13 @@ readonly class DefaultPipeline implements PipelineInterface
     ) {
     }
 
-    public function process(DatasetInterface $dataset): void
+    public function process(DatasetInterface $dataset): EtlReport
     {
         $fields = $dataset->getFields();
+        $report = new EtlReport();
 
         foreach ($dataset->getRows() as $row) {
+            $report->incrementProcessedRows();
             $record = $this->outputRowFactory->create();
             $context = $this->contextFactory->create($dataset, $row, $record);
 
@@ -50,6 +53,11 @@ readonly class DefaultPipeline implements PipelineInterface
                 ),
                 $context
             );
+
+            $report->incrementValidRows();
+            $report->incrementWrittenRows();
         }
+
+        return $report;
     }
 }

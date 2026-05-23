@@ -9,7 +9,9 @@
 
 namespace Ang3\Component\ETL\Contract;
 
+use Ang3\Component\ETL\Result\EtlReport;
+
 interface PipelineInterface
 {
-    public function process(DatasetInterface $dataset): void;
+    public function process(DatasetInterface $dataset): EtlReport;
 }
