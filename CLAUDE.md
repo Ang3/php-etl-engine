@@ -29,7 +29,7 @@ bin/test                      # vendor/bin/phpunit
 
 All three scripts forward extra args (`"$@"`) to the underlying tool, e.g. `bin/check-code --no-progress` or `bin/test --filter=SomeTest`.
 
-Note: there is currently no `tests/` directory or PHPUnit config in the repo, despite `composer.json` declaring the `Ang3\Component\ETL\Tests\` PSR-4 namespace at `tests/` and `bin/test`/`bin/fix-code` referencing it — these will need to be created (with a `phpunit.xml`) before `bin/test` or the `tests/` half of `bin/fix-code` can run.
+Tests live under `tests/` (PSR-4 `Ang3\Component\ETL\Tests\`, mirroring `src/`'s structure), configured by `phpunit.xml.dist` (PHPUnit 11, via `symfony/test-pack`). `phpstan.neon`'s `paths` only cover `src/` — test code isn't statically analyzed.
 
 Docker (optional, mirrors CI environment): `make build`, `make up`, `make bash` (shell into the `php` container), `make down`, `make logs`.
 
