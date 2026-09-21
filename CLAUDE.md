@@ -44,10 +44,12 @@ The library processes a dataset row-by-row through a fixed pipeline, converting 
 `DefaultPipeline` (`src/Pipeline/DefaultPipeline.php`) does the actual work, for each row from `DatasetInterface::getRows()`:
 
 1. Creates a fresh output row via `OutputRowFactoryInterface` (default: `DefaultOutputRowFactory` → `RowMetadata`).
-2. Creates a per-row `ContextInterface` via `ContextFactoryInterface`, binding the dataset, the input row, and the output row together (default: `DefaultContextFactory` → `DefaultContext`).
-3. For every `FieldMetadata` declared by `DatasetInterface::getFields()`, calls `FieldProcessorInterface::process($field, $context)`.
-4. Wraps the input/output pair in a `ProcessedRow` and hands it to `WriterInterface::write()`.
-5. Tallies counts on the returned `EtlReport`.
+2. Creates a per-row `ContextInterface` via `ContextFactoryInterface`, binding the dataset, the input row, and the output row together (default: `DefaultContextFactory` → `DefaultContext`), and sets the `DefaultPipeline::OPTION_STRICT_WRITE_ERRORS` context option from its own `$strict` constructor flag.
+3. For every `FieldMetadata` declared by `DatasetInterface::getFields()`, calls `FieldProcessorInterface::process($field, $context)`, catching each field's failure individually (see Error handling) so one bad field doesn't stop the others from being processed and reported.
+4. Wraps the input/output pair in a `ProcessedRow` (status `Valid`/`Invalid` depending on whether any field failed, plus the collected `EtlError`s) and hands it to `WriterInterface::write()` **regardless of row validity** — the writer decides what to do with invalid rows via `ProcessedRow::isValid()`/`isInvalid()`.
+5. Tallies counts on the returned `EtlReport` (`processedRows`/`validRows`/`invalidRows`/`writtenRows`).
+
+A dataset-level failure (e.g. `getFields()` or the `getRows()` iteration itself throwing, before/outside any row) is fatal: the whole `process()` call stops and `EtlReport::markFatal()` is called with an `EtlError` built directly (no `ContextInterface` exists yet at that point, so `ErrorFactoryInterface` — which requires one — isn't used there).
 
 ### Field processing
 
@@ -66,7 +68,7 @@ The result is written onto the output row via `$context->set($field->reference, 
 
 ### Rows
 
-`RowInterface` is a read-only `get/has/all` map; `MutableRowInterface` adds `set`. `RowMetadata` (`src/Metadata/RowMetadata.php`) is the default mutable implementation (also `ArrayAccess`) and is what output rows are made of by default. `IndexedRowMetadata` is an immutable, positioned (`PositionedRowInterface`) input row. `ArrayRowIterator` is a trivial in-memory `RowIteratorInterface`.
+`RowInterface` is a read-only `get/has/all` map; `MutableRowInterface` adds `set`. `RowMetadata` (`src/Metadata/RowMetadata.php`) is the default mutable implementation (also `ArrayAccess`) and is what output rows are made of by default. `IndexedRowMetadata` is an immutable, positioned (`PositionedRowInterface`) input row. `ArrayRowIterator` is a trivial in-memory `RowIteratorInterface` (which extends `\IteratorAggregate`, not bare `\Traversable`, since PHP requires implementing `\Iterator`/`\IteratorAggregate` — not `\Traversable` alone — to actually be traversable).
 
 ### Error handling
 
@@ -74,13 +76,19 @@ Exceptions under `src/Exception/` all extend the abstract `EtlException`, which 
 
 `ErrorFactoryInterface` (default: `DefaultErrorFactory`) turns any `\Throwable` into an immutable `EtlError` (`src/Error/EtlError.php`) for reporting: it walks the `getPrevious()` chain to find the innermost `EtlException` (for the error/app codes and parameters), the type (`ValidationEtlException`/`TechnicalEtlException` → `ErrorType`), and the stage (`StagedExceptionInterface` → `ErrorStage`), falling back to `ErrorType::Technical` and the stage passed by the caller when nothing in the chain matches.
 
-`EtlReport` (`src/Result/EtlReport.php`) is the mutable aggregate returned by `PipelineInterface::process()`: row counters (processed/valid/invalid/written), a capped sample of `EtlError`s (`maxSampleErrors`, default 100 — full persistence is expected to be handled by a writer/error sink, not the report), and an optional single `fatalError`. Note `DefaultPipeline` currently only increments counters and never calls `addError`/`markFatal`/`incrementInvalidRows` itself — error reporting wiring into the pipeline loop is not yet implemented there.
+`EtlReport` (`src/Result/EtlReport.php`) is the mutable aggregate returned by `PipelineInterface::process()`: row counters (processed/valid/invalid/written), a capped sample of `EtlError`s (`maxSampleErrors`, default 100 — full persistence is expected to be handled by a writer/error sink, not the report), and an optional single `fatalError`.
+
+`DefaultPipeline`'s fault tolerance is deliberately asymmetric between the two failure modes it wires up:
+
+- **Field errors** (raised by `FieldProcessorInterface::process()`) are always collected, never fatal: every field of a row is attempted, each failure becomes one `EtlError` (stage `ErrorStage::FieldProcessing`, added to the report), and the row is marked `RowStatus::Invalid` if at least one field failed — but it is still handed to the writer.
+- **Writer errors** (`WriterInterface::write()` throwing) are controlled by the `DefaultPipeline::OPTION_STRICT_WRITE_ERRORS` context option (mirrors the pipeline's `$strict` constructor flag, default `false`): permissive (default) records an `EtlError` (stage `ErrorStage::Writing`) and moves on to the next row; strict calls `EtlReport::markFatal()` and stops the whole pipeline immediately. Because the flag is read back from the context (not straight from `$this->strict`), a custom component with access to that row's `ContextInterface` could in principle override it per row via `setOption()`.
+- **Dataset-level errors** are always fatal (see Core flow above) — there's no per-row recovery possible when the row source itself is broken.
 
 ### Extension points (implement these to integrate the library)
 
 - `DatasetInterface` — supplies the field schema (`getFields()`) and the rows to iterate (`getRows()`).
 - `WriterInterface` — persists each `ProcessedRow` (implementations should skip virtual fields, i.e. fields with no `FieldTargetMetadata`).
-- `FieldTransformerInterface` — add to `FieldTransformerRegistry` to support a given `FieldMetadata->type`.
+- `FieldTransformerInterface` — add to `FieldTransformerRegistry` to support a given `FieldMetadata->type`. `ChainFieldTransformer` (`src/Transformer/ChainFieldTransformer.php`) composes several transformers into one, applying them in constructor order and supporting a field only if every chained transformer does.
 - `FieldValueResolverInterface` / `HeaderResolverInterface` — customize how raw values are located in the input row.
 - `ContextFactoryInterface` / `OutputRowFactoryInterface` — customize the context/output row implementations used per row.
 
