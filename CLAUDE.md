@@ -31,7 +31,9 @@ All three scripts forward extra args (`"$@"`) to the underlying tool, e.g. `bin/
 
 Tests live under `tests/` (PSR-4 `Ang3\Component\ETL\Tests\`, mirroring `src/`'s structure), configured by `phpunit.xml.dist` (PHPUnit 11, via `symfony/test-pack`). `phpstan.neon`'s `paths` only cover `src/` — test code isn't statically analyzed.
 
-Docker (optional, mirrors CI environment): `make build`, `make up`, `make bash` (shell into the `php` container), `make down`, `make logs`.
+Docker (optional, local dev environment): `make build`, `make up`, `make bash` (shell into the `php` container), `make down`, `make logs`.
+
+CI (`.github/workflows/ci.yml`) runs on every push to `main` and every PR: `tests` (PHPUnit, matrix PHP 8.2/8.3/8.4), `static-analysis` (`bin/check-code`) and `code-style` (`bin/fix-code --dry-run --diff`), each as a separate job on PHP 8.2 unless matrixed.
 
 ## Architecture
 
