@@ -62,6 +62,16 @@ final class ChainFieldTransformerTest extends TestCase
         new ChainFieldTransformer();
     }
 
+    public function testTransformersReturnsTheChainInConstructorOrder(): void
+    {
+        $first = $this->transformerAppending('a');
+        $second = $this->transformerAppending('b');
+
+        $chain = new ChainFieldTransformer($first, $second);
+
+        self::assertSame([$first, $second], $chain->transformers());
+    }
+
     private function transformerAppending(string $suffix): FieldTransformerInterface
     {
         return new class($suffix) implements FieldTransformerInterface {
