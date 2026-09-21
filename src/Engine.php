@@ -11,6 +11,7 @@ namespace Ang3\Component\ETL;
 
 use Ang3\Component\ETL\Contract\DatasetInterface;
 use Ang3\Component\ETL\Contract\PipelineInterface;
+use Ang3\Component\ETL\Result\EtlReport;
 
 readonly class Engine
 {
@@ -18,8 +19,8 @@ readonly class Engine
     {
     }
 
-    public function process(DatasetInterface $dataset): void
+    public function process(DatasetInterface $dataset): EtlReport
     {
-        $this->pipeline->process($dataset);
+        return $this->pipeline->process($dataset);
     }
 }

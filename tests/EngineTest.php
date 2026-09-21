@@ -17,17 +17,18 @@ use PHPUnit\Framework\TestCase;
 
 final class EngineTest extends TestCase
 {
-    public function testProcessDelegatesToThePipeline(): void
+    public function testProcessDelegatesToThePipelineAndReturnsItsReport(): void
     {
         $dataset = $this->createStub(DatasetInterface::class);
+        $report = new EtlReport();
         $pipeline = $this->createMock(PipelineInterface::class);
         $pipeline->expects(self::once())
             ->method('process')
             ->with($dataset)
-            ->willReturn(new EtlReport());
+            ->willReturn($report);
 
         $engine = new Engine($pipeline);
 
-        $engine->process($dataset);
+        self::assertSame($report, $engine->process($dataset));
     }
 }
