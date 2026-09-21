@@ -22,11 +22,9 @@ readonly class ArrayRowIterator implements RowIteratorInterface
     }
 
     /**
-     * @see \IteratorAggregate
-     *
-     * @return \Traversable<RowInterface>
+     * @return \Generator<int, RowInterface>
      */
-    public function getIterator(): \Traversable
+    public function getIterator(): \Generator
     {
         foreach ($this->rows as $row) {
             yield $row;

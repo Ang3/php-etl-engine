@@ -10,8 +10,8 @@
 namespace Ang3\Component\ETL\Contract;
 
 /**
- * @extends \Traversable<int, RowInterface>
+ * @extends \IteratorAggregate<int, RowInterface>
  */
-interface RowIteratorInterface extends \Traversable
+interface RowIteratorInterface extends \IteratorAggregate
 {
 }
