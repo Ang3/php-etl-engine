@@ -16,7 +16,7 @@ use Ang3\Component\ETL\Metadata\FieldMetadata;
 class FieldTransformerRegistry
 {
     /**
-     * @var FieldTransformerInterface[]
+     * @var list<FieldTransformerInterface>
      */
     private array $transformers = [];
 
@@ -37,7 +37,7 @@ class FieldTransformerRegistry
     }
 
     /**
-     * @return FieldTransformerInterface[]
+     * @return list<FieldTransformerInterface>
      */
     public function all(): array
     {

@@ -14,7 +14,7 @@ use Ang3\Component\ETL\Error\EtlError;
 final class EtlReport
 {
     /**
-     * @var EtlError[]
+     * @var list<EtlError>
      */
     private array $sampleErrors = [];
 
@@ -110,7 +110,7 @@ final class EtlReport
      *
      * Full error persistence should be handled by a writer or error sink.
      *
-     * @return EtlError[]
+     * @return list<EtlError>
      */
     public function sampleErrors(): array
     {

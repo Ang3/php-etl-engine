@@ -17,7 +17,7 @@ use Webmozart\Assert\Assert;
 final readonly class ChainFieldTransformer implements FieldTransformerInterface
 {
     /**
-     * @var FieldTransformerInterface[]
+     * @var list<FieldTransformerInterface>
      */
     private array $transformers;
 
@@ -25,7 +25,7 @@ final readonly class ChainFieldTransformer implements FieldTransformerInterface
     {
         Assert::notEmpty($transformers, 'A chain field transformer requires at least one field transformer.');
 
-        $this->transformers = $transformers;
+        $this->transformers = array_values($transformers);
     }
 
     /**
@@ -55,7 +55,7 @@ final readonly class ChainFieldTransformer implements FieldTransformerInterface
     }
 
     /**
-     * @return FieldTransformerInterface[]
+     * @return list<FieldTransformerInterface>
      */
     public function transformers(): array
     {
