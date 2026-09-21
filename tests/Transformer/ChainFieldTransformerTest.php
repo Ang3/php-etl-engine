@@ -76,7 +76,7 @@ final class ChainFieldTransformerTest extends TestCase
 
             public function transform(mixed $value, FieldMetadata $field, ContextInterface $context): mixed
             {
-                return '' === $value ? $this->suffix : $value.'-'.$this->suffix;
+                return is_string($value) && '' !== $value ? $value.'-'.$this->suffix : $this->suffix;
             }
         };
     }
