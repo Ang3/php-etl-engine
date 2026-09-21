@@ -18,7 +18,7 @@ Installation
 ------------
 
 ```bash
-composer require ang3/php-etl
+composer require ang3/php-etl-engine
 ```
 
 Requirements

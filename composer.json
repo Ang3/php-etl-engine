@@ -1,5 +1,5 @@
 {
-  "name": "ang3/php-etl",
+  "name": "ang3/php-etl-engine",
   "type": "component",
   "description": "PHP ETL Abstraction Layer",
   "keywords": ["php", "etl", "layer"],
